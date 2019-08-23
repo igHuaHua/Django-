@@ -1,0 +1,57 @@
+1.数据库编码错误导致无法生成迁移文件，解决方法修改mysql配置文件或者在命令行临时修改
+show variables like ‘character%’;
+set character_set_database=utf8;
+set character_set_server=utf8;
+
+2.将四个app整合到apps，拖进去之后生成迁移文件会报错，说找不到那些import的模块了。
+
+解决方案：右键Mark为sourceRoot。根目录下找不到的，会去apps下搜索。
+
+但是这时候cmd下还是会报错。需要在settings设置
+
+插入第0是希望它先搜索我们app下东西：
+
+import os
+import sys
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0,os.path.join(BASE_DIR,'apps'))
+
+
+3.安装第三方包
+tablib，crispy_forms 缺少，用pip安装
+diff-match-patch 用pip安装出错无法解决，最终官网下载源码包安装
+
+
+4.RuntimeError: Model class user.models.UserAccount doesn't declare an explicit app_label and isn't in an application in INSTALLED_APPS.
+    检查urls.py的引用是否是这样引用：apps.user.urls
+
+               若还有错误继续检查有引用模型文件夹下.py文件的地方，
+
+               把 user 的引用改为 apps.user 的引用
+
+
+5.在多个from .. import ..后   出现了类似django.core.exceptions.ImproperlyConfigured: The included URLconf '' does not appear to have any patterns in it
+                                        DjangoRuntimeError: Model class doesn't declare an explicit app_label
+                                        这样的错误，在百度多次后，决定全部导入换成绝对路径的方式，解决问题
+                                        
+                                        
+										
+6.'Specifying a namespace in include() without providing an app_name is not supported. Set the app_name attribute in the included module, 
+or pass a 2-tuple containing the list of patterns and app_name instead.'
+
+    path('users/', include(('apps.users.urls', "apps.users"), namespace="users")),传入两个元祖即可
+
+
+
+{#                                    <a class="personcenter fl" href="{% url 'users:user_info' %}">进入个人中心</a>#}
+{#                                    <a class="fr" href="{% url 'logout' %}">退出</a>#}
+
+
+
+
+
+
+
+
+
